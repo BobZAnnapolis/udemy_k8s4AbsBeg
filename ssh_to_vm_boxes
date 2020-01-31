@@ -1,5 +1,11 @@
 ssh rjzawis@192.168.1.7   #kubemaster
 ssh rjzawis@192.168.1.8   #kube-node1
 ssh rjzawis@192.168.1.9   #kube-node2
+
 password:password
+
+# K8S HOST-ONLY static ips
+ssh rjzawis@192.168.56.2 {sudo ifconfig epn0s8 192.168.56.2}
+ssh rjzawis@192.168.56.3
+ssh rjzawis@192.168.56.4
 
