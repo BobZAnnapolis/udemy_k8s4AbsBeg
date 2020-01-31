@@ -1,10 +1,37 @@
 VirtualBox
 	copy down Ubuntu, install
-	create user, enable sudo
+        follow steps
+        Bridge Network allows VMs to use home WiFi router to talk out to Internet
+        - needed to install packages
+        - also responsible for assigning the 192.168.1.## 
+        - these might get re-assigned - need to have static IP addresses
+        - create a new HOST-only K8S network - disable DHCP so addresses stay static 
+        - on my VBOX - network had an Adapter 2 vboxnet0 HOST-ONLY
+		ssh rjzawis@192.168.1.7   #kubemaster  192.168.56.2 {sudo ifconfig epn0s8 192.168.56.2}
+		ssh rjzawis@192.168.1.8   #kube-node1  192.168.56.3
+		ssh rjzawis@192.168.1.9   #kube-node2  192.168.56.4
+          - on each vbox - vi /etc/network/interfaces and add below lines to save IP static address
+		# configure enp0s8 interface
+		auto enp0s8
+		iface enp0s8 inet static
+		      address 192.168.56.2 / 3 / 4
+		      netmask 255.255.255.0
+          - save & reboot
+          - on restart 
+            - ifconfig & verify static IP addresses exist {for k8s host-only network  AND}
+            - can ping www.google.com {for internet connectivity to install packages} 
 
-on VMs
+
+
+on VMs - steps, install, etc
 ========
- hostname
+ be root user
+ cat /etc/hostname
+ - change name
+ cat /etc/hosts
+ - add another line at top after localhost 127.0.1.1 hostname - where hostname matches above changed_nm
+ shutdown now - reboot to have hostname and /etc/hosts files take effect
+
  ifconfig
  cd
  sudo apt-get install -y apt-utils net-tools apt-transport-https ca-certificates vim curl software-properties-common
@@ -33,4 +60,58 @@ etcd on MASTER
 controller, scheduler on MASTER
 
 kubectl cmd used to deploy 'run' containers, get 'cluster-info', get 'nodes' info
+
+==================================================================================================================
+==================================================================================================================
+
+MINIKUBE
+========
+downloadable 1 EXE to install all-n-1 minicluster into VirtualBox to play with
+  MASTER
+    kube-apiserver, etcd, node-controller, replica-controller, scheduler
+  NODES
+    kubelet, container_runtime
+  - combines all these together in a single container
+  - need the minikube.exe, HyperVisor to install mini-cluster into, & kubectl to interact with it
+
+
+on iMac
+brew uninstall minikube kubectl {or upgrade, update - may have to unlink some cmds}
+brew install minikube kubectl
+
+
+kubectl expose deployment ... to access web pages
+kubectl service app url .... get url
+kubectl delete deployment ... cleans up
+
+Please find some links to Kubernetes Documentation Site below:
+
+Kubernetes Documentation Site: https://kubernetes.io/docs/
+
+Kubernetes Documentation Concepts: https://kubernetes.io/docs/concepts/
+
+Kubernetes Documentation Setup: https://kubernetes.io/docs/setup/
+
+Kubernetes Documentation - Minikube Setup: https://kubernetes.io/docs/getting-started-guides/minikube/
+
+==================================================================================================================
+==================================================================================================================
+
+KUBEADM
+
+needed to "easily" define multiple machines, define MASTER, NODEs
+
+- must have multiple machines to set up a cluster
+- designate 1 as MASTER, others as WORKERs
+- install container runtime on VMs {docker"
+- install kubeadm on all VMs
+- MASTER - initialize MASTER
+  - installs all required components to identify this as MASTER and to allow communications with WORKERs
+- before connecting WORKERS, VERIFY ALL network pre-requisites
+  - need network connectivity in order for all this to work
+- can't have just normal network connectivity
+- k8s requires a "special network" called a POD Network to perform all inter-vm communications
+- then we can join the WORKER nodes to the MASTER node and verify they're all communicating properly
+- do all this before deploying applications/micro-services
+
 
