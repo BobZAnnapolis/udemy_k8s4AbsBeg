@@ -26,10 +26,6 @@ VirtualBox
             - ifconfig & verify static IP addresses exist {for k8s host-only network  AND}
             - can ping www.google.com {for internet connectivity to install packages} 
 
-This was in the course notes - not sure if it's needed or not
-Documentation web site seems to be having an issue.
-kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
 
 
 
@@ -78,9 +74,22 @@ EOF
  docker ps
 
 - K8S, DOCKER etc are all installed
-- have 1 MASTER 2 NODES
-- before we can connect, have to determine which NETWORK we are using to communication
-  - remember above - we cfg'd the HOST-ONLY network so we have static IPs
+- run docker / docker-compose / kubeadm / kubectl / kubelet version cmds to verify
+- have 1 MASTER 2 NODES 
+- MASTER cfg
+  - before we can connect, have to determine which NETWORK we are using to communication
+    - remember above - we cfg'd the HOST-ONLY network so we have static 192.xxx.xx.x IPs
+  - have to tell MASTER to select & use this HOST-ONLY network for comms
+  - this is referred to as POD NETWORK plug-in
+  - NETWORK MUST BE DEPLOYED BEFORE ANY APPLICATIONS.
+    - KUBE-DNS - internal helper service will NOT start up before this network is installed
+    - KUBEADM ONLY SUPPORTS CONTAINER NETWORK INTERFACE {CNI} based networks, does NOT support kubenet
+  
+This was in the course notes - not sure if it's needed or not
+Documentation web site seems to be having an issue.
+kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+  
 
 
 kube-apiserver on MASTER
